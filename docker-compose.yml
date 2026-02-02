@@ -1,0 +1,48 @@
+name: winboat
+volumes:
+  data:
+services:
+  windows:
+    image: ghcr.io/dockur/windows:5.14
+    container_name: WinBoat
+    environment:
+      VERSION: "11"
+      RAM_SIZE: 10G
+      CPU_CORES: "3"
+      DISK_SIZE: 96G
+      USERNAME: mb
+      PASSWORD: "4357"
+      HOME: ${HOME}
+      LANGUAGE: English
+      USER_PORTS: "7148"
+      HOST_PORTS: "7149"
+      ARGUMENTS: -qmp tcp:0.0.0.0:7149,server,wait=off
+    cap_add:
+      - NET_ADMIN
+    privileged: true
+    ports:
+      - 127.0.0.1:47270-47279:8006
+      - 127.0.0.1:47280-47289:7148
+      - 127.0.0.1:47290-47299:7149
+      - 127.0.0.1:47300-47309:3389/tcp
+      - 127.0.0.1:47310-47319:3389/udp
+      # Codesys ports
+      - "47270-47370:47270-47370"
+      - "1217:1217/tcp"
+      - "1740:1740/udp"
+      - "1741:1741/udp"
+      - "1742:1742/udp"
+      - "1743:1743/udp"
+      # Simens Tia Portal 
+      - "102:102"
+      - "34964:34964/udp"
+      - "4840:4840/udp"
+    stop_grace_period: 120s
+    restart: on-failure
+    volumes:
+      - /home/mb/winboat:/storage
+      - ${HOME}:/shared
+      - /dev/bus/usb:/dev/bus/usb
+      - ./oem:/oem
+    devices:
+      - /dev/kvm
